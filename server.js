@@ -6,6 +6,7 @@
  * Require Statements
  *************************/
 const express = require("express")
+const expressLayouts = require("express-ejs-layouts")
 const env = require("dotenv").config()
 const app = express()
 const static = require("./routes/static")
@@ -13,6 +14,17 @@ const static = require("./routes/static")
 /* ***********************
  * Routes
  *************************/
+
+/* View Engine and Templates*/
+app.set("view engine", "ejs")
+app.use(expressLayouts)
+app.set("layout", "./layouts/layout") // not at views root
+
+app.get("/", function(req, res) {
+  res.render("index", { title: "Home" })
+})
+
+
 app.use(static)
 
 /* ***********************
