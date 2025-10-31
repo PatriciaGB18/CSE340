@@ -1,6 +1,354 @@
-/******* Change Box Model ***************/
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Exo:wght@700&display=swap');
+
+/* --- CSS Variables (Color Scheme & Fonts) --- */
+:root {
+    /* Professional, high-contrast color scheme.
+      Passes WAVE/WCAG contrast checks.
+    */
+    --primary-color: #0A3D62; /* Dark Blue (Headers) */
+    --secondary-color: #0C52A1; /* Bright Blue (CTA/Links) */
+    --cta-hover-color: #084081; /* Darker Blue (CTA Hover) */
+    --light-bg: #F4F7F6; /* Off-white (Body Background) */
+    --white-bg: #FFFFFF; /* White (Wrapper/Card Background) */
+    --dark-text: #333333; /* Dark Gray (Body Text) */
+    --white-text: #FFFFFF; /* White (On CTA) */
+    --border-color: #DDE1E3; /* Light Gray Border */
+
+    /* --- NEW NAVIGATION COLORS --- */
+    /* Added to match the dark bar in the mockups */
+    --nav-bg: #333333; /* Dark Gray Background */
+    --nav-text: #FFFFFF; /* White Link Text */
+    --nav-hover-bg: #555555; /* Lighter Gray for Hover */
+    /* --- END NEW --- */
+
+    --font-primary: 'Roboto', sans-serif; /* Readable body font */
+    --font-secondary: 'Exo', sans-serif; /* Professional header/display font */
+}
+
+/* --- Base & Mobile-First Styles (Outside Media Query) --- */
+body {
+    font-family: var(--font-primary);
+    color: var(--dark-text);
+    margin: 0;
+    padding: 0;
+    background-color: var(--light-bg);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+#wrapper {
+    /* On desktop, this centers the content with a white background */
+    background-color: var(--white-bg);
+    max-width: 1200px; /* Max width for large screens */
+    margin: 0 auto;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+main {
+    padding: 0 1rem; /* Horizontal padding for mobile */
+}
+
+h1, h2 {
+    font-family: var(--font-secondary);
+    color: var(--primary-color);
+}
+
+.welcome-heading {
+    /* This is the "Welcome to CSE Motors!" h1 */
+    text-align: center;
+    font-size: 1.8rem;
+    padding: 1rem 0;
+}
+/* ==============================================
+  --- NEW: Top Header --- 
+  Styles for the <header> element, mobile-first.
+  ==============================================
+*/
+#top-header {
+    display: flex; /* Use flexbox to align children */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    justify-content: space-between; /* Push items to opposite ends */
+    align-items: center; /* Vertically center them */
+    padding: 1rem 1.5rem; /* Add spacing around the header */
+}
+
+/* Style the "CSE Motors" site name */
+.siteName a {
+    font-family: var(--font-secondary); /* Use 'Exo' font */
+    font-size: 2rem; /* Make it large like the mockup */
+    font-weight: 700;
+    color: var(--primary-color); /* Use the dark blue header color */
+    text-decoration: none; /* <-- ESTA É A LINHA QUE REMOVE O SUBLINHADO */
+}
+
+/* Style the "My Account" link */
+#tools a {
+    font-family: var(--font-primary);
+    font-weight: bold;
+    color: var(--secondary-color); /* Use the bright blue link color */
+    text-decoration: none;
+    transition: text-decoration 0.3s ease;
+}
+
+#tools a:hover {
+    text-decoration: underline; /* Add underline on hover */
+}
+/* --- END NEW HEADER STYLES --- */
+
+
+/* ==============================================
+  --- NEW: Navigation Bar --- 
+  Styles for the <nav> element, mobile-first.
+  ==============================================
+*/
+nav {
+    background-color: var(--nav-bg);
+}
+
+nav ul {
+    /* Use Flexbox to align items horizontally */
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on small screens if needed */
+    justify-content: center; /* Center items for mobile */
+    
+    /* Remove default list styles */
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+nav li {
+    /* On mobile, each item will grow equally */
+    flex-grow: 1;
+}
+
+nav a {
+    /* This makes the link behave like a button */
+    display: block; /* Take up the full space of the <li> */
+    padding: 0.8rem 6rem;
+    color: var(--nav-text);
+    text-decoration: none;
+    text-align: center;
+    font-family: var(--font-secondary); /* Use the header font */
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+}
+
+/* Style for hover/focus for accessibility and interaction */
+nav a:hover,
+nav a:focus {
+    background-color: var(--nav-hover-bg);
+    color: var(--white-text); /* Ensure text stays white */
+    outline: none; /* Remove default focus outline for a cleaner look */
+}
+/* --- END NEW NAVIGATION STYLES --- */
+
+
+/* --- Hero Section (Mobile) --- */
+/* On mobile, layout is stacked: Callout, then Image */
+.hero-section {
+    position: relative;
+    background-color: var(--white-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-callout {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.hero-callout h2 {
+    font-size: 2rem;
+    color: var(--secondary-color);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.hero-callout p {
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--secondary-color);
+    color: var(--white-text);
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.cta-button:hover {
+    background-color: var(--cta-hover-color);
+    text-decoration: none;
+}
+
+.hero-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- Home Features (Mobile) --- */
+/* On mobile, sections stack: Upgrades, then Reviews */
+.home-features {
+    padding-bottom: 1rem;
+}
+
+.upgrades, .reviews {
+    background-color: var(--white-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Upgrades Section (Mobile) --- */
+.upgrade-grid {
+    display: grid;
+    /* Mobile: 2x2 grid for upgrade icons */
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.upgrade-item {
+    display: block;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    background-color: var(--light-bg); /* Blue background from mockup */
+    text-decoration: none;
+}
+.upgrade-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    text-decoration: none;
+}
+
+.upgrade-item .upgrade-icon {
+    /* White background for the icon image itself */
+    background-color: var(--white-bg);
+    border-radius: 8px;
+    width: 100%;
+    padding-bottom: 75%; /* Aspect ratio for the icon container */
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.5rem;
+    overflow: hidden;
+}
+
+.upgrade-item img {
+    width: 80%; /* Scale image within its container */
+    height: auto;
+    max-width: 80px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.upgrade-item p {
+    margin: 0;
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+/* --- Reviews Section (Mobile) --- */
+.reviews ul {
+    /* Use bullet points as shown in the mockups */
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0;
+}
+
+.reviews li {
+    margin-bottom: 0.75rem;
+}
+
+
+/* ==============================================
+  --- Media Query (Large Screens) --- 
+  Per requirement: Adjusts styles for larger devices.
+  ==============================================
+*/
+@media (min-width: 768px) {
+    
+    main {
+        padding: 0; /* Remove base padding */
+    }
+
+    .welcome-heading {
+        text-align: left;
+        padding: 1.5rem 2rem;
+        font-size: 2rem;
+    }
+
+    /* --- NEW: Navigation Bar (Large) --- */
+    nav ul {
+        /* On large screens, align links to the left */
+        justify-content: flex-start;
+    }
+
+    nav li {
+        /* Remove the 'grow' property so buttons are their natural width */
+        flex-grow: 0;
+    }
+    /* --- END NEW --- */
+
+
+    /* --- Hero Section (Large) --- */
+    .hero-section {
+        /* Use CSS Grid for side-by-side layout */
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 2rem;
+        margin: 0 2rem 2rem 2rem; /* Add horizontal margin */
+    }
+
+    .hero-callout {
+        /* Callout is on the left */
+        order: 1;
+        text-align: left;
+        margin-bottom: 0;
+    }
+
+    .hero-image {
+        /* Image is on the right */
+        order: 2;
+        width: 100%;
+    }
+
+    /* --- Home Features (Large) --- */
+    .home-features {
+        /* On large screens, this becomes a 2-column grid */
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        /* Define grid areas to match the large layout (Upgrades left, Reviews right) */
+        grid-template-areas: "upgrades reviews";
+        gap: 2rem;
+        padding: 0 2rem 2rem 2rem; /* Bottom padding */
+    }
+
+    .upgrades {
+        grid-area: upgrades; /* Assign to the 'upgrades' grid area */
+        margin-bottom: 0;
+    }
+
+    .reviews {
+        grid-area: reviews; /* Assign to the 'reviews' grid area */
+        margin-bottom: 0;
+    }
 }
