@@ -1,0 +1,22 @@
+<% /* =====================================================
+     Content heading: show the title passed from the controller
+     If no title, redirect to home (best-practice guard)
+   ===================================================== */ %>
+<% if (title) { %>
+  <h1><%= title %></h1>
+<% } else {
+     res.redirect('/')
+   } %>
+
+<% /* =====================
+     Message block (commented out for now)
+     When messages() is implemented, remove the '#' to enable it
+   ===================== */ %>
+<%# messages() %>
+
+<% /* =====================
+     Inventory items display
+     'grid' is an HTML string built in utilities.buildClassificationGrid
+     Use unescaped output so the HTML renders correctly
+   ===================== */ %>
+<%- grid %>

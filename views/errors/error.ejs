@@ -1,0 +1,15 @@
+<% /* Error view - displays title and message passed from the error handler */ %>
+
+<% if (title) { %>
+  <h1><%= title %></h1>
+<% } else { %>
+  <h1>Server Error</h1>
+<% } %>
+
+<section class="error-message">
+  <p>Oh no — something went sideways. Here's the message we have:</p>
+  <div class="error-box">
+    <%- message %>
+  </div>
+  <p><a href="/">Return to home</a></p>
+</section>
