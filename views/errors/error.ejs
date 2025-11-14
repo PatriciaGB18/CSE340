@@ -1,15 +1,30 @@
-<% /* Error view - displays title and message passed from the error handler */ %>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= title || "Server Error" %></title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  
 
-<% if (title) { %>
-  <h1><%= title %></h1>
-<% } else { %>
-  <h1>Server Error</h1>
-<% } %>
+  <main class="container">
+    <section class="error-page">
+      <h1>Error <%= status || '' %></h1>
+      <p><%= message || 'An unexpected error occurred.' %></p>
 
-<section class="error-message">
-  <p>Oh no — something went sideways. Here's the message we have:</p>
-  <div class="error-box">
-    <%- message %>
-  </div>
-  <p><a href="/">Return to home</a></p>
-</section>
+      <% if (stack) { %>
+        <details>
+          <summary>View error details</summary>
+          <pre><%= stack %></pre>
+        </details>
+      <% } %>
+
+      <a href="/" class="btn">Return to Home</a>
+    </section>
+  </main>
+
+ 
+</body>
+</html>

@@ -1,5 +1,10 @@
 <% const d = new Date()
 let year = d.getFullYear() %>
+
 <footer>
-    <p class="copyright">&copy; <%= year %> CSE 340 App</p>
+  <p class="copyright">&copy; <%= year %> CSE 340 App</p>
+  <div class="footer-links">
+    <%# This link must match the route in inventoryRoute.js %>
+    <a href="/inv/trigger-error">Trigger 500 error (test)</a>
+  </div>
 </footer>
