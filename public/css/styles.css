@@ -107,7 +107,7 @@ nav {
 
 nav ul {
     /* Use Flexbox to align items horizontally */
-    display: flex;
+    display: none; /* Initially hidden, will be toggled with JS */
     flex-direction: column; 
     
     /* Remove default list styles */
@@ -115,7 +115,26 @@ nav ul {
     padding: 0;
     list-style-type: none;
 }
+/* This new class will be toggled by JavaScript */
+nav ul.open {
+    display: flex; /* Show the menu when it has the .open class */
+}
+/* --- Hamburger Button Styles --- */
+#hamburgerBtn {
+    display: inline-block; /* Show on mobile */
+    font-size: 2rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    padding: 0 0.5rem;
+    margin-left: 0.5rem;
+}
 
+/* Hide hamburger button on desktop */
+@media (min-width: 768px) {
+    #hamburgerBtn {
+        display: none;
+    }
+}
 nav li {
     /* On mobile, each item will grow equally */
     flex-grow: 1;
@@ -296,6 +315,7 @@ nav a:focus {
     /* --- NEW: Navigation Bar (Large) --- */
     nav ul {
         /* On large screens, align links to the left */
+        display: flex;
         flex-direction: row;
         justify-content: flex-start;
       
