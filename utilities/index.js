@@ -100,25 +100,15 @@ Util.wrapVehicleAsHTML = function (vehicle) {
         </div>
       </div>
     </div>
-    <style>
-      .vehicle-detail { display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap; }
-      .vehicle-image img { max-width: 100%; height: auto; border-radius: 8px; display:block; }
-      .vehicle-image { flex: 1 1 420px; max-width: 720px; }
-      .vehicle-info { flex: 1 1 320px; min-width: 280px; }
-      .vehicle-title { margin: 0 0 .25rem 0; font-size: 1.6rem; }
-      .vehicle-sub { margin: 0 0 1rem 0; color: #333; font-size: 1.1rem; }
-      .vehicle-meta { margin: .25rem 0; }
-      .vehicle-desc { margin-top: 1rem; line-height: 1.5; }
-      @media (max-width: 768px) {
-        .vehicle-detail { flex-direction: column; }
-        .vehicle-image, .vehicle-info { max-width: 100%; }
-      }
-    </style>
   `
 }
+/* In utilities/index.js */
 Util.buildClassificationList = function (data) {
   let list = `<select name="classification_id" id="classification_id" required>`
   
+  // ADD THIS LINE
+  list += `<option value="">Choose a Classification</option>`
+
   data.forEach(row => {
     list += `<option value="${row.classification_id}">${row.classification_name}</option>`
   })

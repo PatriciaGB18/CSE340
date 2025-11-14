@@ -1,22 +1,8 @@
-<!-- views/inventory/detail.ejs -->
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title><%= title %> | Inventory</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-</head>
-<body>
-  <%- include('../partials/header') %>
+<%# This file (detail.ejs) is a "child" view. %>
+<%# It must NOT contain <html>, <body>, <head>, or <main> tags. %>
+<%# It will be injected into the main layout.ejs's <main> tag. %>
 
-  <main class="container">
-    <!-- vehicleHTML já contém estrutura sem escapar -->
-    <section class="inventory-detail">
-      <%- vehicleHTML %>
-    </section>
-  </main>
-
-  <%- include('../partials/footer') %>
-</body>
-</html>
+<section class="inventory-detail">
+  <%# This 'vehicleHTML' variable comes from your controller %>
+  <%- vehicleHTML %>
+</section>

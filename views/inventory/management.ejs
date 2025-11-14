@@ -1,31 +1,30 @@
+<%# This file (management.ejs) is a "child" view. %>
+<%# It must NOT contain <html>, <body>, or <main> tags. %>
+<%# It will be injected into the layout.ejs's <main> tag. %>
 
-<h1>Vehicle Management</h1>
-<p>Vehicle added successfully!</p>
-<a href="/inv/add-vehicle">Add another vehicle</a>
+<%# Use the 'title' variable passed from the controller %>
+<h1><%= title %></h1>
+<h2>Welcome to the inventory management system</h2>
 
+<%# Check if a message was passed (e.g., from a successful form submission) %>
+<% if (message) { %>
+  <p class="notice"><%- message %></p>
+  <%# This link should only show if there is a success message %>
+  <a href="/inv/add-vehicle">Add another vehicle</a>
+<% } %>
 
+<p><a href="/inv/add-classification" title="Add new classification">Add New Classification</a></p>
+<p><a href="/inv/add-vehicle" title="Add new vehicle">Add New Vehicle</a></p>
 
+<h2>Inventory by Classification</h2>
+<p>Choose a classification to see its vehicles</p>
 
-<main>
-  <h1>Inventory Management</h1>
-  <h2>Welcome to the inventory management system</h2>
-  
-  <p><a href="/inv/add-classification" title="Add new classification">Add New Classification</a></p>
-  <p><a href="/inv/add-vehicle" title="Add new vehicle">Add New Vehicle</a></p>
+<select id="classificationList">
+  <option>Choose a Classification</option>
+</select>
 
-  <h2>Inventory by Classification</h2>
-  <p>Choose a classification to see its vehicles</p>
+<noscript>
+  <p><strong>JavaScript must be enabled to use this feature.</strong></p>
+</noscript>
 
-  <!-- Placeholder for dynamic classification dropdown -->
-  <select id="classificationList">
-    <option>Choose a Classification</option>
-  </select>
-
-  <noscript>
-    <p><strong>JavaScript must be enabled to use this feature.</strong></p>
-  </noscript>
-
-  <table id="inventoryDisplay"></table>
-</main>
-
-
+<table id="inventoryDisplay"></table>

@@ -1,10 +1,21 @@
+<%# This file (add-classification.ejs) is a "child" view. %>
+<%# It must NOT contain <html>, <body>, or <main> tags. %>
 
+<%# Use the 'title' variable from the controller %>
+<h1><%= title %></h1>
 
-<main>
-  <h1>Add New Classification</h1>
-  <form action="/inv/add-classification" method="post">
-    <label for="classification_name">Classification Name:</label>
-    <input type="text" id="classification_name" name="classification_name" required>
-    <button type="submit">Add Classification</button>
-  </form>
-</main>
+<%# Display any error messages that are passed in %>
+<% if (errors && errors.length > 0) { %>
+  <ul class="notice">
+    <% errors.forEach(error => { %>
+      <li><%= error.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<form action="/inv/add-classification" method="post">
+  <label for="classification_name">Classification Name:</label>
+  <input type="text" id="classification_name" name="classification_name" required pattern="^[a-zA-Z]+$">
+  <p class="form-note">Note: Classification name must be alphabetic characters only.</p>
+  <button type="submit">Add Classification</button>
+</form>
