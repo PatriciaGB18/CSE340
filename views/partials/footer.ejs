@@ -8,11 +8,7 @@ let year = d.getFullYear() %>
     <a href="/inv/trigger-error">Trigger 500 error (test)</a>
   </div>
 </footer>
-<%# ... Seu conteúdo de footer existente ... %>
 
-
-<%# --- SCRIPT DO MENU HAMBÚRGUER --- %>
-<%# Adicione este script ao final do seu footer %>
 <script>
     // Hamburger Menu Toggle
     // Seleciona o botão que você adicionou no header.ejs
@@ -22,8 +18,7 @@ let year = d.getFullYear() %>
     const navigation = document.querySelector('nav ul'); 
 
     hamButton.addEventListener('click', (e) => {
-        e.preventDefault(); // Impede o link de pular para o topo
-        // Adiciona ou remove a classe '.open'
+        e.preventDefault(); 
         navigation.classList.toggle('open'); 
     });
 </script>
