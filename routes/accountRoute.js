@@ -4,14 +4,9 @@
 const express = require("express");
 const router = new express.Router();
 const accountController = require("../controllers/accountController");
-const utilities = require("../utilities/"); // <-- MANTER APENAS ESTA LINHA
+const utilities = require("../utilities/");
 const regValidate = require("../utilities/account-validation"); 
 
-// --- Rotas de Inventário (Removidas para limpar este arquivo) ---
-// Note: As linhas abaixo pertencem ao arquivo inventoryRoute.js e foram removidas daqui:
-// const invController = require("../controllers/inventoryController") 
-// router.get("/", utilities.handleErrors(invController.buildManagement))
-// -------------------------------------------------------------------
 
 /* ****************************************
  * Deliver Login View (GET)
@@ -41,7 +36,7 @@ router.post(
   "/login",
   regValidate.loginRules(), 
   regValidate.checkLoginData, 
-  utilities.handleErrors(accountController.accountLogin) // NOTE: O controller para login geralmente é 'accountLogin' ou similar, não 'registerAccount'
+  utilities.handleErrors(accountController.accountLogin) 
 )
 
 module.exports = router;

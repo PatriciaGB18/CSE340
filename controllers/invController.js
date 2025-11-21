@@ -24,10 +24,10 @@ invCont.buildManagement = async function (req, res, next) {
  * Route: /inv/add-classification (GET)
  * *************************************** */
 invCont.buildAddClassification = async function (req, res, next) {
-    const nav = await utilities.getNav() // CORREÇÃO: Buscando 'nav'
+    const nav = await utilities.getNav() 
     res.render("inventory/add-classification", {
         title: "Add New Classification",
-        nav, // Passando a NAV obtida
+        nav, 
         errors: null, 
         classification_name: "",
     })
@@ -35,7 +35,7 @@ invCont.buildAddClassification = async function (req, res, next) {
 
 invCont.buildByClassificationId = async function (req, res, next) {
     const classification_id = req.params.classificationId;
-    const nav = await utilities.getNav(); // Injetando NAV
+    const nav = await utilities.getNav(); 
     const data = await invModel.getInventoryByClassificationId(classification_id);
     const grid = await utilities.buildClassificationGrid(data);
 
