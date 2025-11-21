@@ -1,21 +1,33 @@
-<%# This file (add-classification.ejs) is a "child" view. %>
-<%# It must NOT contain <html>, <body>, or <main> tags. %>
 
-<%# Use the 'title' variable from the controller %>
-<h1><%= title %></h1>
 
-<%# Display any error messages that are passed in %>
-<% if (errors && errors.length > 0) { %>
-  <ul class="notice">
-    <% errors.forEach(error => { %>
-      <li><%= error.msg %></li>
-    <% }) %>
-  </ul>
-<% } %>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1><%= title %></h1>
+            
+            <%- messages() %>
 
-<form action="/inv/add-classification" method="post">
-  <label for="classification_name">Classification Name:</label>
-  <input type="text" id="classification_name" name="classification_name" required pattern="^[a-zA-Z]+$">
-  <p class="form-note">Note: Classification name must be alphabetic characters only.</p>
-  <button type="submit">Add Classification</button>
-</form>
+            <%- include('../partials/errors') %>
+            
+            <p class="alert alert-info">Classification name must not contain spaces or special characters.</p>
+
+            <form id="addClassificationForm" action="/inv/add-classification" method="POST">
+                <div class="form-group">
+                    <label for="classificationName">Classification Name:</label>
+                    <input 
+                        type="text" 
+                        id="classificationName" 
+                        name="classification_name" 
+                        class="form-control" 
+                        required 
+                        pattern="^\S+$" 
+                        title="No spaces or special characters allowed"
+                        value="<%= locals.classification_name %>"
+                    >
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">Add Classification</button>
+            </form>
+        </div>
+    </div>
+</div>

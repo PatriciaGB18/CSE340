@@ -1,0 +1,141 @@
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1><%= title %></h1>
+            
+            <%- messages() %>
+
+            <%- include('../partials/errors') %>
+            
+            <form id="addInventoryForm" action="/inv/add-inventory" method="POST">
+                
+                <div class="form-group">
+                    <label for="classificationList">Classification:</label>
+                    <%- classificationList %>
+                </div>
+
+                <div class="form-group">
+                    <label for="invMake">Make:</label>
+                    <input 
+                        type="text" 
+                        id="invMake" 
+                        name="inv_make" 
+                        class="form-control" 
+                        required 
+                        placeholder="e.g., Audi"
+                        maxlength="40"
+                        value="<%= locals.inv_make %>"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="invModel">Model:</label>
+                    <input 
+                        type="text" 
+                        id="invModel" 
+                        name="inv_model" 
+                        class="form-control" 
+                        required 
+                        placeholder="e.g., R8"
+                        maxlength="40"
+                        value="<%= locals.inv_model %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="invDescription">Description:</label>
+                    <textarea 
+                        id="invDescription" 
+                        name="inv_description" 
+                        class="form-control" 
+                        required
+                    ><%= locals.inv_description %></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="invImage">Image Path (e.g., /images/vehicles/no-image.png):</label>
+                    <input 
+                        type="text" 
+                        id="invImage" 
+                        name="inv_image" 
+                        class="form-control" 
+                        required 
+                        value="<%= locals.inv_image %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="invThumbnail">Thumbnail Path (e.g., /images/vehicles/no-image-tn.png):</label>
+                    <input 
+                        type="text" 
+                        id="invThumbnail" 
+                        name="inv_thumbnail" 
+                        class="form-control" 
+                        required 
+                        value="<%= locals.inv_thumbnail %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="invPrice">Price:</label>
+                    <input 
+                        type="number" 
+                        id="invPrice" 
+                        name="inv_price" 
+                        class="form-control" 
+                        required 
+                        step="0.01" 
+                        min="0"
+                        placeholder="e.g., 35000"
+                        value="<%= locals.inv_price %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="invYear">Year:</label>
+                    <input 
+                        type="number" 
+                        id="invYear" 
+                        name="inv_year" 
+                        class="form-control" 
+                        required 
+                        min="1886" 
+                        max="<%= new Date().getFullYear() + 1 %>"
+                        value="<%= locals.inv_year %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="invMiles">Miles:</label>
+                    <input 
+                        type="number" 
+                        id="invMiles" 
+                        name="inv_miles" 
+                        class="form-control" 
+                        required 
+                        min="0"
+                        placeholder="e.g., 10000"
+                        value="<%= locals.inv_miles %>"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="invColor">Color:</label>
+                    <input 
+                        type="text" 
+                        id="invColor" 
+                        name="inv_color" 
+                        class="form-control" 
+                        required 
+                        maxlength="20"
+                        value="<%= locals.inv_color %>"
+                    >
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">Add Vehicle</button>
+            </form>
+        </div>
+    </div>
+</div>

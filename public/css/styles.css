@@ -637,3 +637,19 @@ nav a:focus {
   margin-top: 0.2rem;
   margin-bottom: 0.5rem;
 }
+
+/* Exemplo de CSS customizado */
+body {
+    background-color: #f8f9fa; /* Light gray background */
+}
+/* Estilo para a barra de navegação principal (se não estiver usando classes de cor do Bootstrap) */
+.site-header {
+    background-color: #343a40; /* Dark background */
+    color: white;
+}
+/* Estilo para caixas de conteúdo principal */
+.container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    /* Adicione sombra ou cor de fundo se quiser que o formulário se destaque */
+}

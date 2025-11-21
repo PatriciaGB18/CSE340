@@ -1,140 +1,146 @@
+// invController.js
+
 const invModel = require("../models/inventory-model")
-const utilities = require("../utilities/")
+const utilities = require("../utilities/") 
 
 const invCont = {}
 
-/* ***************************
- *  Build inventory by classification view
- * ************************** */
-invCont.buildByClassificationId = async function (req, res, next) {
-  const classification_id = req.params.classificationId
-  const data = await invModel.getInventoryByClassificationId(classification_id)
-  const grid = await utilities.buildClassificationGrid(data)
-  let nav = await utilities.getNav()
-  const className = data[0].classification_name
-  res.render("./inventory/classification", {
-    title: className + " vehicles",
-    nav,
-    grid,
-  })
-}
-
-/* ***************************
- *  Build vehicle detail view
- * ************************** */
-/* ***************************
- * Build vehicle detail view
- * ************************** */
-invCont.buildVehicleDetailView = async function (req, res, next) {
-  const invId = req.params.inv_id
-  try {
-    const vehicle = await invModel.getInventoryItemById(invId)
-    if (!vehicle) {
-      const err = new Error("Vehicle not found")
-      err.status = 404
-      return next(err)
-    }
-
+/* ****************************************
+ * Deliver management view
+ * Route: /inv/ 
+ * *************************************** */
+invCont.buildManagement = async function (req, res, next) {
     const nav = await utilities.getNav()
-    // AQUI ESTÁ A MUDANÇA:
-    // 1. Chamamos a nova função da utility para construir o HTML
-    const vehicleDetail = utilities.wrapVehicleAsHTML(vehicle)
-
-    res.render("inventory/detail", {
-      title: `${vehicle.inv_make} ${vehicle.inv_model}`,
-      nav,
-      // 2. Passamos o HTML gerado para a view
-      vehicleDetail,
+    res.render("inventory/management", {
+        title: "Inventory Management",
+        // Assumes nav is available via res.locals.nav (from app.js middleware)
+        nav,
+        errors: null,
     })
-  } catch (error) {
-    next(error)
-  }
 }
 
-/* ***************************
- *  Build inventory management view
- * ************************** */
-invCont.buildManagementView = async function (req, res, next) {
-  let nav = await utilities.getNav()
-  res.render("inventory/management", {
-    title: "Inventory Management",
-    nav,
-    message: null,
-  })
-}
-
-/* ***************************
- *  Build Add Classification View
- * ************************** */
+/* ****************************************
+ * Deliver add classification view
+ * Route: /inv/add-classification (GET)
+ * *************************************** */
 invCont.buildAddClassification = async function (req, res, next) {
-  let nav = await utilities.getNav()
-  res.render("inventory/add-classification", {
-    title: "Add New Classification",
-    nav,
-    errors: null
-  })
-}
-
-// Handle form submission to add classification
-invCont.addClassification = async function (req, res, next) {
-  try {
-    const { classification_name } = req.body;
-    await invModel.insertClassification(classification_name);
-    res.redirect("/inv/management");
-  } catch (error) {
-    next(error);
-  }
-}
-
-/* ***************************
- *  Build Add Vehicle View
- * ************************** */
-/* ***************************
- *  Build Add Vehicle View
- * ************************** */
-invCont.buildAddVehicle = async function (req, res, next) {
-  try {
-    const nav = await utilities.getNav()
-
-    const classifications = await invModel.getClassifications()
-    console.log("classifications:", classifications)
-
-    const classificationSelect =
-      await utilities.buildClassificationList(classifications)
-
-    res.render("inventory/add-vehicle", {
-      title: "Add New Vehicle",
-      nav,
-      classificationSelect,
-      errors: null
+    const nav = await utilities.getNav() // CORREÇÃO: Buscando 'nav'
+    res.render("inventory/add-classification", {
+        title: "Add New Classification",
+        nav, // Passando a NAV obtida
+        errors: null, 
+        classification_name: "",
     })
-  } catch (error) {
-    console.error("buildAddVehicle error:", error)
-    next(error)
-  }
 }
 
+invCont.buildByClassificationId = async function (req, res, next) {
+    const classification_id = req.params.classificationId;
+    const nav = await utilities.getNav(); // Injetando NAV
+    const data = await invModel.getInventoryByClassificationId(classification_id);
+    const grid = await utilities.buildClassificationGrid(data);
+
+    let className = data.length > 0 ? data[0].classification_name : "Vehicle";
+
+    res.render("./inventory/classification", {
+        title: className + " vehicles",
+        nav,
+        grid,
+        errors: null,
+    });
+};
 
 
+/* ****************************************
+ * Process new classification submission
+ * Route: /inv/add-classification (POST)
+ * *************************************** */
+invCont.registerClassification = async function (req, res) {
+    // Note: The validation middleware runs first. If validation fails, it re-renders the view.
+    const { classification_name } = req.body
 
+    const classificationResult = await invModel.registerClassification(classification_name)
 
-// Handle form submission to add vehicle
-invCont.addVehicle = async function (req, res, next) {
-  try {
-    const vehicleData = req.body
-    await invModel.insertVehicle(vehicleData)
-    res.redirect("/inv/management")
-  } catch (error) {
-    next(error)
-  }
+    if (classificationResult) {
+        req.flash(
+            "notice",
+            `Congratulations, the new classification "${classification_name}" has been added.`
+        )
+        // SUCCESS: Rebuild navigation to show the new classification immediately
+        const nav = await utilities.getNav() 
+        res.render("inventory/management", {
+            title: "Inventory Management",
+            nav, // Pass the newly built navigation
+        })
+    } else {
+        // FAILURE:
+        req.flash("notice", "Sorry, the registration failed.")
+        const nav = await utilities.getNav() // Get nav just in case
+        res.status(501).render("inventory/add-classification", {
+            title: "Add New Classification",
+            nav,
+            errors: null, // Errors handled by validation middleware, not here
+            classification_name, // Stickiness
+        })
+    }
 }
 
-/* ***************************
- * Trigger an intentional 500 error (Task 3)
- * ************************** */
-invCont.triggerError = async function (req, res, next) {
-  // This will intentionally throw an error
-  throw new Error("500 Error Test - This is an intentional error.")
+/* ****************************************
+ * Deliver add inventory view
+ * Route: /inv/add-inventory (GET)
+ * *************************************** */
+invCont.buildAddInventory = async function (req, res, next) {
+    // Build the classification list dynamically for the select element
+    const nav = await utilities.getNav()
+    const classificationList = await utilities.buildClassificationList()
+    res.render("inventory/add-inventory", {
+        title: "Add New Vehicle",
+        nav,
+        classificationList, // Pass the dynamically built list
+        errors: null,
+        // Initial setup for sticky data
+        inv_make: "", inv_model: "", inv_description: "", inv_image: "/images/vehicles/no-image.png", inv_thumbnail: "/images/vehicles/no-image-tn.png", inv_price: "", inv_year: "", inv_miles: "", inv_color: "", classification_id: "",
+    })
 }
+
+/* ****************************************
+ * Process new inventory submission
+ * Route: /inv/add-inventory (POST)
+ * *************************************** */
+invCont.registerInventory = async function (req, res) {
+    // Note: The validation middleware runs first. If validation fails, it handles stickiness.
+    const { 
+        inv_make, inv_model, inv_description, inv_image, inv_thumbnail, inv_price, inv_year, inv_miles, inv_color, classification_id
+    } = req.body
+
+    const inventoryResult = await invModel.registerInventory(
+        inv_make, inv_model, inv_description, inv_image, inv_thumbnail, inv_price, inv_year, inv_miles, inv_color, classification_id
+    )
+
+    if (inventoryResult) {
+        // SUCCESS: Display message on the Management View
+        req.flash(
+            "notice",
+            `Success! The ${inv_make} ${inv_model} has been added to the inventory.`
+        )
+        // Redirect to the management view (Task 3 requirement)
+        res.redirect("/inv/") 
+    } else {
+        // FAILURE: Re-render the form with error message and stickiness
+        const nav = await utilities.getNav()
+        const classificationList = await utilities.buildClassificationList(classification_id) // Rebuild for stickiness
+        
+        req.flash("notice", "Sorry, adding the vehicle failed.")
+        res.status(501).render("inventory/add-inventory", {
+            title: "Add New Vehicle",
+            nav,
+            classificationList,
+            errors: null,
+            // Pass all form values back for stickiness
+            inv_make, inv_model, inv_description, inv_image, inv_thumbnail, inv_price, inv_year, inv_miles, inv_color, classification_id,
+        })
+    }
+}
+
+// ... Keep your existing functions (like buildByClassificationId) ...
 
 module.exports = invCont

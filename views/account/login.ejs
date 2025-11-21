@@ -8,6 +8,13 @@
       <h1><%= title %></h1>
 
       <%- messages() %>
+      <% if (errors) { %>
+  <ul class="notice">
+    <% errors.array().forEach(error => { %>
+      <li><%= error.msg %></li>
+    <%  }) %>
+  </ul>
+<% } %>
 
       <form id="loginForm" action="/account/login" method="POST">
         <fieldset>
@@ -18,6 +25,7 @@
               id="account_email"
               name="account_email"
               required  
+              value="<%= locals.account_email %>"
             />
 
             <label for="account_password">Password:</label>

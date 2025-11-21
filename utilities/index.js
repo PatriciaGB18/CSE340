@@ -1,15 +1,16 @@
 // utilities/index.js
-const invModel = require("../models/inventory-model")
+const invModel = require("../models/inventory-model") // Corrected/Confirmed Model name
 const Util = {}
 
 /* ************************
  * Constructs the nav HTML unordered list
- ************************** */
+ * ************************** */
 Util.getNav = async function () {
   let data = await invModel.getClassifications()
   let list = "<ul>"
   list += '<li><a href="/" title="Home page">Home</a></li>'
-  data.forEach((row) => {
+  // Adjusted to use data.rows for consistency with buildClassificationList and the Model
+  data.rows.forEach((row) => { 
     list += "<li>"
     list +=
       '<a href="/inv/type/' +
@@ -25,6 +26,7 @@ Util.getNav = async function () {
   list += "</ul>"
   return list
 }
+
 /* ****************************************
  * Middleware For Handling Errors
  * Wrap other function in this for 
@@ -33,15 +35,15 @@ Util.getNav = async function () {
 Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
 /* **************************************
-* Build the classification view HTML
-* ************************************ */
+ * Build the classification view HTML
+ * ************************************ */
 Util.buildClassificationGrid = async function(data){
   let grid
   if(data.length > 0){
     grid = '<ul id="inv-display">'
     data.forEach(vehicle => { 
       grid += '<li>'
-      grid +=  '<a href="../../inv/detail/'+ vehicle.inv_id 
+      grid += 	'<a href="../../inv/detail/'+ vehicle.inv_id 
       + '" title="View ' + vehicle.inv_make + ' '+ vehicle.inv_model 
       + ' details"><img src="' + vehicle.inv_thumbnail 
       +'" alt="Image of '+ vehicle.inv_make + ' ' + vehicle.inv_model 
@@ -66,8 +68,8 @@ Util.buildClassificationGrid = async function(data){
 }
 
 /* **************************************
-* Helper functions for formatting
-* ************************************ */
+ * Helper functions for formatting
+ * ************************************ */
 Util.formatCurrencyUSD = function (value) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
 }
@@ -77,11 +79,11 @@ Util.formatNumber = function (value) {
 }
 
 /* **************************************
-* Build vehicle detail HTML
-* ************************************ */
+ * Build vehicle detail HTML
+ * ************************************ */
 Util.wrapVehicleAsHTML = function (vehicle) {
   const price = Util.formatCurrencyUSD(vehicle.inv_price || 0)
-  const mileage = vehicle.inv_miles ? Util.formatNumber(vehicle.inv_miles) : 'N/A'
+  const mileage = Util.formatNumber(vehicle.inv_miles) || 'N/A' // Use helper function
   const title = `${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}`
 
   return `
@@ -92,7 +94,7 @@ Util.wrapVehicleAsHTML = function (vehicle) {
       <div class="vehicle-info">
         <h1 class="vehicle-title">${vehicle.inv_make} ${vehicle.inv_model}</h1>
         <h2 class="vehicle-sub">${vehicle.inv_year} • ${price}</h2>
-        <p class="vehicle-meta"><strong>Mileage:</strong> ${vehicle.inv_miles}</p>
+        <p class="vehicle-meta"><strong>Mileage:</strong> ${mileage}</p>
         <p class="vehicle-meta"><strong>Color:</strong> ${vehicle.inv_color || 'N/A'}</p>
         <div class="vehicle-desc">
           <h3>Description</h3>
@@ -102,23 +104,29 @@ Util.wrapVehicleAsHTML = function (vehicle) {
     </div>
   `
 }
-/* In utilities/index.js */
-Util.buildClassificationList = function (data) {
-  let list = `<select name="classification_id" id="classification_id" required>`
-  
-  // ADD THIS LINE
-  list += `<option value="">Choose a Classification</option>`
 
-  data.forEach(row => {
-    list += `<option value="${row.classification_id}">${row.classification_name}</option>`
-  })
-
-  list += `</select>`
-  return list
+/* ****************************************
+ * Build classification select list (TASK 3)
+ * ************************************ */
+Util.buildClassificationList = async function (classification_id = null) {
+    // Requires invModel.getClassifications() to return the result object with a 'rows' property
+    let data = await invModel.getClassifications() 
+    let classificationList =
+      '<select name="classification_id" id="classificationList" required class="form-control">' 
+    classificationList += "<option value=''>Choose a Classification</option>"
+    data.rows.forEach((row) => {
+      classificationList += '<option value="' + row.classification_id + '"'
+      if (
+        classification_id != null &&
+        Number(row.classification_id) === Number(classification_id) 
+      ) {
+        classificationList += " selected "
+      }
+      classificationList += ">" + row.classification_name + "</option>"
+    })
+    classificationList += "</select>"
+    return classificationList
 }
-
-
-
 
 
 module.exports = Util

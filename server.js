@@ -6,6 +6,7 @@
 /* ***********************
  * Require Statements
  *************************/
+const utilities = require("./utilities")
 const path = require("path")
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
@@ -25,7 +26,7 @@ const app = express()
 // Controllers & Routes
 
 
-const utilities = require("./utilities")
+
 
 /* ***********************
  * Middleware
