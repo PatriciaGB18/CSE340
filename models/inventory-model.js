@@ -70,7 +70,7 @@ async function registerClassification(classification_name) {
     } catch (error) {
         console.error("registerClassification error: " + error)
         // Return error object on failure, as controller checks for truthiness
-        return error 
+        return false
     }
 }
 
@@ -104,7 +104,7 @@ async function registerInventory(
     } catch (error) {
         console.error("registerInventory error: " + error)
         // Return error object on failure, as controller checks for truthiness
-        return error
+        return false
     }
 }
 
