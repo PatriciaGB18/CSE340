@@ -6,6 +6,7 @@ const router = new express.Router();
 const accountController = require("../controllers/accountController");
 const utilities = require("../utilities/");
 const regValidate = require("../utilities/account-validation"); 
+const accountValidate = require("../middlewares/accountValidation");
 
 
 /* ****************************************
@@ -43,5 +44,25 @@ router.post(
   regValidate.checkLoginData, 
   utilities.handleErrors(accountController.accountLogin) 
 )
+// Route to handle logout request
+router.get("/logout", utilities.handleErrors(accountController.accountLogout));
 
+// Requires checkLogin to ensure only logged-in users can access
+router.get("/update/:accountId", utilities.checkLogin, utilities.handleErrors(accountController.buildUpdateView));
+
+// Route to process the account update form submission
+router.post("/update/",
+    utilities.checkLogin,
+    accountValidate.updateRules(),
+    accountValidate.checkUpdateData,
+    utilities.handleErrors(accountController.updateAccount)
+);
+
+// Route to process the password change form submission
+router.post("/change-password/",
+    utilities.checkLogin,
+    accountValidate.passwordRules(),
+    accountValidate.checkPassword,
+    utilities.handleErrors(accountController.updatePassword)
+);
 module.exports = router;

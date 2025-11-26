@@ -1,76 +1,89 @@
-// Needed Resources 
 const express = require("express")
 const router = new express.Router() 
-const invController = require("../controllers/invController") // Using invController as confirmed
+const invController = require("../controllers/invController") 
 const utilities = require("../utilities")
-const invValidate = require("../utilities/inventory-validation")
+const invValidate = require("../utilities/inventory-validation") // Assumed file for validation
 
-// --- Route for Management View (/inv/) ---
+// Helper to ensure utilities is available
+const { checkAuthorization, handleErrors } = utilities; 
+
+/* ************************************
+ * Inventory Management Routes (RESTRICTED - Task 2)
+ * All these routes require 'Employee' or 'Admin' access.
+ * ************************************/
+
 // Route to build the management view
-router.get("/", utilities.handleErrors(invController.buildManagement)) 
+router.get("/", checkAuthorization, handleErrors(invController.buildManagement)); 
 
-// --- Routes for Adding Classification (Task 2) ---
+// --- Routes for Adding Classification ---
 // Route to deliver add classification view
-router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification))
+router.get("/add-classification", checkAuthorization, handleErrors(invController.buildAddClassification));
 
-// Route to process the new classification submission (Includes Server-side Validation)
+// Route to process the new classification submission (Protected POST)
 router.post(
     "/add-classification",
-    invValidate.classificationRules(), // Validation rules
-    invValidate.checkClassificationData, // Check validation result and manage stickiness
-    utilities.handleErrors(invController.registerClassification) // Controller function
-)
+    checkAuthorization, // Authorization check here
+    invValidate.classificationRules(), 
+    invValidate.checkClassificationData, 
+    handleErrors(invController.registerClassification)
+);
 
-// --- Routes for Adding Inventory Item (Vehicle) (Task 3) ---
+// --- Routes for Adding Inventory Item (Vehicle) ---
 // Route to deliver add inventory view
-router.get("/add-inventory", utilities.handleErrors(invController.buildAddInventory))
+router.get("/add-inventory", checkAuthorization, handleErrors(invController.buildAddInventory));
 
-// Route to process the new inventory submission (Includes Server-side Validation)
+// Route to process the new inventory submission (Protected POST)
 router.post(
     "/add-inventory",
-    invValidate.inventoryRules(), // Validation rules
-    invValidate.checkInventoryData, // Check validation result and manage stickiness
-    utilities.handleErrors(invController.registerInventory) // Controller function
-)
+    checkAuthorization, // Authorization check here
+    invValidate.inventoryRules(), 
+    invValidate.checkInventoryData, 
+    handleErrors(invController.registerInventory)
+);
 
-// --- Existing Routes (Keep for completeness) ---
+// --- Routes for Editing Inventory Item ---
+// Route to deliver the edit inventory view (Protected GET)
+router.get("/edit/:inv_id", checkAuthorization, handleErrors(invController.buildEditInventoryView));
+
+// Route to process the update inventory data (Protected POST)
+router.post(
+    "/update",
+    checkAuthorization, // Authorization check here
+    invValidate.inventoryRules(), 
+    invValidate.checkUpdateData, 
+    handleErrors(invController.updateInventory)
+);
+
+// --- Routes for Deleting Inventory Item ---
+// Route to build delete confirmation view (Protected GET)
+router.get("/delete/:inv_id", checkAuthorization, handleErrors(invController.buildDeleteView));
+
+// Route to handle the delete process (Protected POST)
+router.post("/delete", checkAuthorization, handleErrors(invController.deleteInventoryItem));
+
+
+/* ************************************
+ * Public Routes (NO Authorization check needed - Task 2)
+ * These are for general site visitors.
+ * ************************************/
+
+// Route to get inventory items by classification ID and return as JSON
+router.get("/getInventory/:classification_id", handleErrors(invController.getInventoryJSON));
+
 // Route to build inventory by classification view
 router.get("/type/:classificationId",
-    utilities.handleErrors(invController.buildByClassificationId)
-)
+    handleErrors(invController.buildByClassificationId)
+);
 
 // Route to build vehicle detail view
 router.get("/detail/:inv_id",
-    utilities.handleErrors(invController.buildVehicleDetailView)
-)
+    handleErrors(invController.buildVehicleDetailView)
+);
 
 // Route to trigger a 500 error 
 router.get("/trigger-error",
-    utilities.handleErrors(invController.triggerError)
-)
-// Route to get inventory items by classification ID and return as JSON
-router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON))
-
-// Route to deliver the edit inventory view
-router.get("/edit/:inv_id", utilities.handleErrors(invController.buildEditInventoryView))
+    handleErrors(invController.triggerError)
+);
 
 
-// Route to process the update inventory data
-// Uses validation and error checking middleware
-router.post(
-    "/update",
-    invValidate.inventoryRules(), // Validation rules
-    invValidate.checkUpdateData, // Middleware to handle errors/stickiness specific to the EDIT view
-    utilities.handleErrors(invController.updateInventory) // Controller function to execute update
-)
-
-
-// Route to build delete confirmation view
-// Needs inv_id as a parameter
-router.get("/delete/:inv_id", utilities.handleErrors(invController.buildDeleteView))
-
-// Route to handle the delete process
-router.post("/delete", utilities.handleErrors(invController.deleteInventoryItem))
-
-
-module.exports = router
+module.exports = router;

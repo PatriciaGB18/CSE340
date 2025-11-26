@@ -136,12 +136,132 @@ async function accountLogin(req, res) {
  * ************************************ */
 async function buildAccountManagement(req, res, next) {
   let nav = await utilities.getNav()
-  res.render("account/account-management", { // Certifique-se de que o nome da view corresponde
+  res.render("account/account-management", { 
     title: "Account Management",
     nav,
-    // Inclua flash messages e erros se a view os exigir
+   
     errors: null, 
   })
 }
-// Não se esqueça de adicionar a função ao module.exports
-module.exports = { buildLogin, buildRegister, registerAccount, accountLogin, buildAccountManagement }
+
+/* ****************************************
+ * Process account logout
+ * *************************************** */
+async function accountLogout(req, res, next) {
+  // Clear the JWT cookie from the client's browser
+  res.clearCookie("jwt");
+  // Redirect the client to the home view
+  res.redirect("/");
+}
+
+/* ****************************************
+ * Deliver account update view
+ * *************************************** */
+async function buildUpdateView(req, res, next) {
+    const account_id = parseInt(req.params.accountId);
+    let nav = await utilities.getNav();
+    const accountData = await accountModel.getAccountById(account_id);
+
+    // If the account ID from the URL does not match the logged-in user, redirect to management view
+    if (accountData.account_id !== res.locals.accountData.account_id) {
+        req.flash("notice", "Unauthorized access attempt.");
+        return res.redirect("/account/");
+    }
+
+    // Since checkJWT already loaded the data into res.locals.accountData, 
+    // we don't need to pass the data explicitly to the view; it's already available.
+    res.render("account/account-update", {
+        title: "Account Update",
+        nav,
+        errors: null,
+    });
+}
+
+
+/* ****************************************
+ * Process account update
+ * *************************************** */
+async function updateAccount(req, res, next) {
+    const { account_firstname, account_lastname, account_email, account_id } = req.body;
+
+    const updateResult = await accountModel.updateAccount(
+        account_firstname,
+        account_lastname,
+        account_email,
+        account_id
+    );
+
+    if (updateResult) {
+        req.flash("notice", `Account details updated successfully.`);
+
+        // 1. Re-query the database to get the NEW account data
+        const accountData = await accountModel.getAccountById(account_id);
+
+        // 2. Create a new JWT token with the NEW data
+        const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 });
+
+        // 3. Set the new token in the cookie (resets the logged-in data)
+        res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 3600 * 1000 });
+        
+        // 4. Update the res.locals for the immediate view render
+        res.locals.accountData = accountData;
+
+        // Deliver the management view where the updated information will be displayed
+        res.redirect("/account/");
+    } else {
+        req.flash("notice", "Sorry, the account update failed.");
+        let nav = await utilities.getNav();
+        const accountData = await accountModel.getAccountById(account_id);
+        
+        // Use submitted data as sticky data for the update view in case of failure
+        res.locals.accountData = {
+            ...accountData,
+            account_firstname,
+            account_lastname,
+            account_email
+        };
+
+        res.render("account/account-update", {
+            title: "Account Update",
+            nav,
+            errors: null, // Errors are already handled by checkUpdateData middleware
+        });
+    }
+}
+
+
+/* ****************************************
+ * Process password change
+ * *************************************** */
+async function updatePassword(req, res, next) {
+    const { account_password, account_id } = req.body;
+
+    // Hash the new password before updating
+    let hashedPassword;
+    try {
+        hashedPassword = await bcrypt.hash(account_password, 10);
+    } catch (error) {
+        req.flash("notice", 'Sorry, there was an error processing the password.');
+        return res.redirect("/account/");
+    }
+
+    const updateResult = await accountModel.updatePassword(
+        hashedPassword,
+        account_id
+    );
+
+    if (updateResult) {
+        req.flash("notice", `Password updated successfully.`);
+        // Redirect to management view
+        res.redirect("/account/");
+    } else {
+        req.flash("notice", "Sorry, the password change failed.");
+        let nav = await utilities.getNav();
+        
+        // Redirect to management view after failure to show message
+        res.redirect("/account/");
+    }
+}
+
+module.exports = { buildLogin, buildRegister, registerAccount, accountLogin, buildAccountManagement, accountLogout,
+  buildUpdateView,updateAccount,updatePassword, }

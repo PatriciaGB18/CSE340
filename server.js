@@ -23,11 +23,6 @@ const cookieParser = require("cookie-parser")
 
 const app = express()
 
-// Controllers & Routes
-
-
-
-
 /* ***********************
  * Middleware
  * ************************/
@@ -47,8 +42,15 @@ app.use(function(req, res, next){
   res.locals.messages = require('express-messages')(req, res)
   next()
 })
+
+// Must run before checkJWT to allow reading the JWT cookie
 app.use(cookieParser())
-app.use(utilities.checkJWTToken)
+
+// JWT check must be applied after cookie-parser 
+// This sets res.locals.loggedin and res.locals.accountData globally
+app.use(utilities.checkJWT); 
+
+
 /* ***********************
  * View Engine and Templates
  *************************/
@@ -61,6 +63,7 @@ app.set("layout", "layouts/layout")
  * Static Files
  *************************/
 app.use(express.static(path.join(__dirname, "public")))
+
 /* ***********************
  * Body Parsers (important!)
  *************************/
@@ -76,11 +79,8 @@ app.get("/", utilities.handleErrors(baseController.buildHome))
 // Inventory routes
 app.use("/inv", inventoryRoute)
 
-
-
+// Account routes (Defined only once)
 app.use("/account", accountRoute); 
-
-
 
 
 /* ***********************
