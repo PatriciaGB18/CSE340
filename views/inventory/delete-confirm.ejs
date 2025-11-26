@@ -1,0 +1,54 @@
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <% if (title) { %>
+                <h1 class="mb-4"><%= title %></h1>
+            <% } else {
+                res.redirect('/')
+            } %>
+
+            <%- messages() %>
+
+            <% if (errors) { %>
+                <ul class="notice">
+                <% errors.forEach(error => { %>
+                    <li><%= error.msg %></li>
+                <%  }) %>
+                </ul>
+            <% } %>
+
+            <p class="alert alert-danger">
+                <strong>Confirm Deletion:</strong> The delete is **permanent** and cannot be undone. 
+                Please ensure this is the correct vehicle to delete.
+            </p>
+            
+            <form id="deleteForm" action="/inv/delete" method="post">
+                
+                <div class="mb-3">
+                    <label for="inv_make" class="form-label">Make:</label>
+                    <input type="text" id="inv_make" name="inv_make" class="form-control" required value="<%= inv_make %>" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label for="inv_model" class="form-label">Model:</label>
+                    <input type="text" id="inv_model" name="inv_model" class="form-control" required value="<%= inv_model %>" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label for="inv_year" class="form-label">Year:</label>
+                    <input type="text" id="inv_year" name="inv_year" class="form-control" required value="<%= inv_year %>" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label for="inv_price" class="form-label">Price:</label>
+                    <input type="text" id="inv_price" name="inv_price" class="form-control" required value="<%= inv_price %>" readonly>
+                </div>
+
+                <input type="hidden" name="inv_id" value="<%= inv_id %>">
+
+                <button type="submit" class="btn btn-danger mt-3">Delete</button>
+            </form>
+
+            </div>
+    </div>
+</div>

@@ -262,4 +262,69 @@ invCont.updateInventory = async function (req, res, next) {
         })
     }
 }
+
+// ... (Código para buildEditInventoryView e updateInventory) ...
+
+/* ***************************
+ * Build delete inventory view
+ * ************************** */
+// Function definition remains the same
+async function buildDeleteView(req, res, next) {
+    const inv_id = await parseInt(req.params.inv_id)
+    const nav = await utilities.getNav()
+    const itemData = await invModel.getInventoryItemById(inv_id)
+    
+    // Check if itemData exists to avoid errors
+    if (!itemData || itemData.length === 0) {
+        req.flash("notice", "Sorry, no inventory item was found.")
+        return res.redirect("/inv/")
+    }
+
+    const itemName = `${itemData.inv_make} ${itemData.inv_model}`
+    
+    // Render the delete confirmation view
+    res.render("./inventory/delete-confirm", {
+        title: "Delete " + itemName,
+        nav,
+        errors: null,
+        inv_id: itemData.inv_id,
+        inv_make: itemData.inv_make,
+        inv_model: itemData.inv_model,
+        inv_year: itemData.inv_year,
+        inv_price: itemData.inv_price,
+    })
+}
+
+// ATTACH THE NEW FUNCTION TO invCont
+invCont.buildDeleteView = buildDeleteView // <-- FIX 1: Attach buildDeleteView
+
+/* ***************************
+ * Process delete inventory item
+ * ************************** */
+// Function definition remains the same
+async function deleteInventoryItem(req, res, next) {
+    const inv_id = parseInt(req.body.inv_id) // Get the inv_id from the hidden input
+
+    // Call the model function to perform the deletion
+    const deleteResult = await invModel.deleteInventoryItem(inv_id)
+
+    if (deleteResult) {
+        // If successful, send a flash message and redirect to the management view
+        req.flash("notice", `The item was successfully deleted.`)
+        res.redirect("/inv/")
+    } else {
+        // If failed, send a flash failure message and re-render the delete view
+        const nav = await utilities.getNav()
+        req.flash("notice", "Sorry, the deletion failed.")
+        // Redirect to rebuild the delete view with the inv_id
+        res.redirect(`/inv/delete/${inv_id}`)
+    }
+}
+
+// ATTACH THE NEW FUNCTION TO invCont
+invCont.deleteInventoryItem = deleteInventoryItem // <-- FIX 2: Attach deleteInventoryItem
+
+
+
+
 module.exports = invCont
