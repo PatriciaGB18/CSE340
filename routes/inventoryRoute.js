@@ -48,5 +48,20 @@ router.get("/detail/:inv_id",
 router.get("/trigger-error",
     utilities.handleErrors(invController.triggerError)
 )
+// Route to get inventory items by classification ID and return as JSON
+router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON))
+
+// Route to deliver the edit inventory view
+router.get("/edit/:inv_id", utilities.handleErrors(invController.buildEditInventoryView))
+
+
+// Route to process the update inventory data
+// Uses validation and error checking middleware
+router.post(
+    "/update",
+    invValidate.inventoryRules(), // Validation rules
+    invValidate.checkUpdateData, // Middleware to handle errors/stickiness specific to the EDIT view
+    utilities.handleErrors(invController.updateInventory) // Controller function to execute update
+)
 
 module.exports = router

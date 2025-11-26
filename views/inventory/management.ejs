@@ -1,5 +1,3 @@
-
-
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -11,9 +9,33 @@
             <p>Use the links below to manage inventory data:</p>
             
             <ul class="list-group">
-                <li class="list-group-item"><a href="/inv/add-classification" title="Add New Classification">Add New Classification</a></li>
-                <li class="list-group-item"><a href="/inv/add-inventory" title="Add New Inventory Item">Add New Inventory Item</a></li>
+                <!-- Rota corrigida para o endpoint do servidor -->
+                <li class="list-group-item"><a href="/inv/add-classification" title="Adicionar Nova Classificação">Add New Classification</a></li>
+                <!-- Rota corrigida para o endpoint do servidor -->
+                <li class="list-group-item"><a href="/inv/add-inventory" title="Adicionar Novo Item de Inventário">Add New Inventory Item</a></li>
             </ul>
         </div>
     </div>
+
+    <!-- START: Seção de Gerenciamento de Inventário (AJAX) -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h2>Manage Inventory</h2>
+
+            <p>Select a classification from the list to see the items belonging to the classification.</p>
+
+            <!-- Renderiza o menu suspenso de classificações -->
+            <%- classificationSelect %>
+            
+            <!-- Tabela vazia para ser preenchida via AJAX -->
+            <table id="inventoryDisplay" class="table table-striped table-hover"></table>
+
+            <!-- Mensagem se o JavaScript estiver desabilitado -->
+            <noscript>JavaScript must be enabled to use this page.</noscript>
+        </div>
+    </div>
+    <!-- END: Seção de Gerenciamento de Inventário (AJAX) -->
 </div>
+
+<!-- Caminho corrigido para o arquivo JavaScript (se 'public' for a pasta estática) -->
+<script src="/js/inventory.js"></script>

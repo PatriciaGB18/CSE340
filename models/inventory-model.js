@@ -107,8 +107,67 @@ async function registerInventory(
         return false
     }
 }
+/* **************************************
+ * Get inventory item data by inventory Id
+ * ************************************ */
+async function getInventoryById(inv_id) {
+    try {
+        // SQL query to join inventory and classification tables and filter by inv_id
+        const data = await pool.query(
+            "SELECT * FROM public.inventory AS i JOIN public.classification AS c ON i.classification_id = c.classification_id WHERE i.inv_id = $1",
+            [inv_id]
+        )
+        // Returns the first (and should be only) row found
+        return data.rows[0]
+    } catch (error) {
+        console.error("getInventoryById error: " + error)
+    }
+}
+/* *****************************
+* Update Inventory Data
+* ***************************** */
+async function updateInventory(
+    inv_id,
+    inv_make,
+    inv_model,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_year,
+    inv_miles,
+    inv_color,
+    classification_id
+) {
+    try {
+        // SQL query to update a single inventory item based on inv_id
+        // $1 through $10 are the updated values, and $11 is the inv_id for the WHERE clause
+        const sql =
+            "UPDATE public.inventory SET inv_make = $1, inv_model = $2, inv_description = $3, inv_image = $4, inv_thumbnail = $5, inv_price = $6, inv_year = $7, inv_miles = $8, inv_color = $9, classification_id = $10 WHERE inv_id = $11 RETURNING *"
+        
+        // Array of values corresponding to the SQL placeholders
+        const data = await pool.query(sql, [
+            inv_make,
+            inv_model,
+            inv_description,
+            inv_image,
+            inv_thumbnail,
+            inv_price,
+            inv_year,
+            inv_miles,
+            inv_color,
+            classification_id,
+            inv_id // inv_id is the eleventh parameter
+        ])
+        
+        // Returns the updated row data (if update was successful and one row was updated)
+        return data.rows[0]
 
-
+    } catch (error) {
+        console.error("model error: " + error) // Log the error to the console
+        throw new Error(error) // Throw an error for the controller to catch
+    }
+}
 /* ***************************
  * Export all functions
  * ************************** */
@@ -119,4 +178,6 @@ module.exports = {
   registerClassification,
   checkExistingClassification,
   registerInventory,
+  getInventoryById,
+  updateInventory,
 }

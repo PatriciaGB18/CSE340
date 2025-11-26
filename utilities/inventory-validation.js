@@ -135,5 +135,48 @@ validate.checkInventoryData = async (req, res, next) => {
     }
     next()
 }
+/* ****************************************
+ * Check data and return to edit view or proceed to update
+ * Renders the EDIT-INVENTORY view upon failure.
+ * *************************************** */
+validate.checkUpdateData = async (req, res, next) => {
+    // Coleta todos os dados, incluindo o inv_id oculto
+    const { inv_id, inv_make, inv_model, inv_description, inv_image, inv_thumbnail, inv_price, inv_year, inv_miles, inv_color, classification_id } = req.body
+    
+    // Rebusca os dados necessários para renderizar a lista de classificação
+    let classificationSelect = await utilities.buildClassificationList(classification_id)
+    
+    // Checa por erros de validação
+    let errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        let nav = await utilities.getNav()
+        // Determina o nome do item para o título com base nos dados recebidos
+        const itemName = `${inv_make} ${inv_model}` 
+        
+        // Renderiza a VIEW DE EDIÇÃO (Crucial: render 'edit-inventory')
+        res.render("./inventory/edit-inventory", {
+            title: "Edit " + itemName,
+            nav,
+            classificationSelect: classificationSelect,
+            errors: errors.array(), // Passa os erros de validação
+            // Passa de volta todos os campos do formulário (stickiness) incluindo inv_id
+            inv_id, // IMPORTANTE: Garante que inv_id é passado de volta para o campo oculto
+            inv_make,
+            inv_model,
+            inv_year,
+            inv_description,
+            inv_image,
+            inv_thumbnail,
+            inv_price,
+            inv_miles,
+            inv_color,
+            classification_id
+        })
+        return // Para a execução se forem encontrados erros
+    }
+    next() // Continua para a função do controlador (updateInventory) se não houver erros
+}
 
+// IMPORTANTE: Não se esqueça de adicionar 'checkUpdateData' ao módulo de exports
+// no final do seu arquivo utilities/inventory-validation.js.
 module.exports = validate

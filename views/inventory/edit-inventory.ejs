@@ -1,0 +1,128 @@
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4"><%= title %></h1>
+            <%- messages() %>
+
+            <p class="text-muted">Fields marked with an asterisk (*) are required.</p>
+
+            <!-- FORM ID ADDED HERE for the client-side JavaScript hook -->
+            <form id="updateForm" action="/inv/update" method="post">
+                
+                <div class="mb-3">
+                    <label for="classification_id" class="form-label">*Classification</label>
+                    <%- classificationSelect %>
+                </div>
+
+                <div class="mb-3">
+                    <label for="inv_make" class="form-label">*Make</label>
+                    <input type="text" 
+                        class="form-control" 
+                        id="inv_make" 
+                        name="inv_make" 
+                        required 
+                        value="<%= locals.inv_make %>">
+                </div>
+
+                <div class="mb-3">
+                    <label for="inv_model" class="form-label">*Model</label>
+                    <input type="text" 
+                        class="form-control" 
+                        id="inv_model" 
+                        name="inv_model" 
+                        required 
+                        value="<%= locals.inv_model %>">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="inv_description" class="form-label">*Description</label>
+                    <textarea 
+                        class="form-control" 
+                        id="inv_description" 
+                        name="inv_description" 
+                        rows="3" 
+                        required><%= locals.inv_description %></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="inv_image" class="form-label">*Image Path (ex: /images/vehicles/image.jpg)</label>
+                    <input type="text" 
+                        class="form-control" 
+                        id="inv_image" 
+                        name="inv_image" 
+                        required 
+                        value="<%= locals.inv_image %>">
+                </div>
+
+                <div class="mb-3">
+                    <label for="inv_thumbnail" class="form-label">*Thumbnail Path (ex: /images/vehicles/image-tn.jpg)</label>
+                    <input type="text" 
+                        class="form-control" 
+                        id="inv_thumbnail" 
+                        name="inv_thumbnail" 
+                        required 
+                        value="<%= locals.inv_thumbnail %>">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="inv_price" class="form-label">*Price (USD)</label>
+                        <input type="number" 
+                            class="form-control" 
+                            id="inv_price" 
+                            name="inv_price" 
+                            required 
+                            step="0.01" 
+                            min="0"
+                            value="<%= locals.inv_price %>">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="inv_year" class="form-label">*Year</label>
+                        <input type="number" 
+                            class="form-control" 
+                            id="inv_year" 
+                            name="inv_year" 
+                            required 
+                            min="1900" 
+                            max="2100"
+                            value="<%= locals.inv_year %>">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="inv_miles" class="form-label">*Mileage</label>
+                        <input type="number" 
+                            class="form-control" 
+                            id="inv_miles" 
+                            name="inv_miles" 
+                            required 
+                            min="0"
+                            value="<%= locals.inv_miles %>">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="inv_color" class="form-label">*Color</label>
+                        <input type="text" 
+                            class="form-control" 
+                            id="inv_color" 
+                            name="inv_color" 
+                            required 
+                            value="<%= locals.inv_color %>">
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON IS DISABLED BY DEFAULT -->
+                <button type="submit" class="btn btn-primary mt-3" disabled>Update Vehicle</button>
+                
+                <!-- HIDDEN FIELD: Passes the inv_id needed for the UPDATE query -->
+                <input type="hidden" name="inv_id" value="<%= locals.inv_id %>">
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Link the new client-side JavaScript to enable the button on change -->
+<script src="/js/inv-update.js"></script>

@@ -1,5 +1,3 @@
-// invController.js
-
 const invModel = require("../models/inventory-model")
 const utilities = require("../utilities/") 
 
@@ -8,14 +6,19 @@ const invCont = {}
 /* ****************************************
  * Deliver management view
  * Route: /inv/ 
+ * * FIX: This function now includes the logic to fetch 
+ * the classification list, resolving the EJS error.
  * *************************************** */
 invCont.buildManagement = async function (req, res, next) {
     const nav = await utilities.getNav()
+    // 1. Build the classification select list, needed for management view
+    const classificationSelect = await utilities.buildClassificationList() 
+
     res.render("inventory/management", {
         title: "Inventory Management",
-        // Assumes nav is available via res.locals.nav (from app.js middleware)
         nav,
         errors: null,
+        classificationSelect, // Pass the select list to the view
     })
 }
 
@@ -141,6 +144,122 @@ invCont.registerInventory = async function (req, res) {
     }
 }
 
-// ... Keep your existing functions (like buildByClassificationId) ...
+/* ***************************
+ * Return Inventory by Classification As JSON
+ * ************************** */
+invCont.getInventoryJSON = async (req, res, next) => {
+    // Collect classification_id from URL parameters and cast to integer
+    const classification_id = parseInt(req.params.classification_id) 
+    
+    // Call the model function to fetch inventory data
+    const invData = await invModel.getInventoryByClassificationId(classification_id)
+    
+    // Check if data was returned (inv_id on the first element ensures it's inventory data)
+    if (invData.length > 0 && invData[0].inv_id) {
+      return res.json(invData) // Return the data as a JSON object
+    } else {
+      // It's safer to throw an error via next() or return an empty JSON object, 
+      // but following the original instruction's check:
+      next(new Error("No data returned")) // Throw an error if no data is found
+    }
+}
 
+
+/* ***************************
+ * Build edit inventory view
+ * ************************** */
+invCont.buildEditInventoryView = async function (req, res, next) {
+    // Coleta o inv_id da URL e converte para inteiro
+    const inv_id = parseInt(req.params.inv_id)
+    
+    const nav = await utilities.getNav()
+    
+    // Chama o modelo para obter os dados do item
+    const itemData = await invModel.getInventoryById(inv_id)
+
+    // Constrói o menu suspenso de classificações, pré-selecionando a classificação atual do item
+    const classificationSelect = await utilities.buildClassificationList(itemData.classification_id)
+    
+    // Cria o nome para o título da página
+    const itemName = `${itemData.inv_make} ${itemData.inv_model}`
+    
+    // Renderiza a view de edição
+    res.render("./inventory/edit-inventory", {
+        title: "Edit " + itemName, // Título da página
+        nav,
+        classificationSelect: classificationSelect,
+        errors: null,
+        // Passa todos os dados do item para preencher o formulário (stickiness)
+        inv_id: itemData.inv_id,
+        inv_make: itemData.inv_make,
+        inv_model: itemData.inv_model,
+        inv_year: itemData.inv_year,
+        inv_description: itemData.inv_description,
+        inv_image: itemData.inv_image,
+        inv_thumbnail: itemData.inv_thumbnail,
+        inv_price: itemData.inv_price,
+        inv_miles: itemData.inv_miles,
+        inv_color: itemData.inv_color,
+        classification_id: itemData.classification_id
+    })
+}
+
+/* ***************************
+ * Process inventory update
+ * ************************** */
+invCont.updateInventory = async function (req, res, next) {
+    // Collect all form data, including the hidden inv_id
+    const {
+        inv_id, inv_make, inv_model, inv_description, inv_image, inv_thumbnail, inv_price, inv_year, inv_miles, inv_color, classification_id
+    } = req.body
+
+    // Call the Model function to execute the UPDATE query
+    const updateResult = await invModel.updateInventory(
+        inv_id,
+        inv_make,
+        inv_model,
+        inv_description,
+        inv_image,
+        inv_thumbnail,
+        inv_price,
+        inv_year,
+        inv_miles,
+        inv_color,
+        classification_id
+    )
+
+    // Check if the update was successful (updateResult will contain the updated row)
+    if (updateResult) {
+        const itemName = updateResult.inv_make + " " + updateResult.inv_model
+        req.flash("notice", `The ${itemName} was successfully updated.`)
+        // Redirect to the management view on success
+        res.redirect("/inv/")
+    } else {
+        // If update failed (e.g., database error), retrieve necessary data to re-render the view
+        const nav = await utilities.getNav()
+        const classificationSelect = await utilities.buildClassificationList(classification_id)
+        const itemName = `${inv_make} ${inv_model}` 
+        
+        req.flash("notice", "Sorry, the update failed.")
+        
+        // Render the edit view again, maintaining stickiness and error message
+        res.status(501).render("./inventory/edit-inventory", {
+            title: "Edit " + itemName,
+            nav,
+            classificationSelect: classificationSelect,
+            errors: null, // Errors were caught by validation middleware
+            inv_id,
+            inv_make,
+            inv_model,
+            inv_year,
+            inv_description,
+            inv_image,
+            inv_thumbnail,
+            inv_price,
+            inv_miles,
+            inv_color,
+            classification_id
+        })
+    }
+}
 module.exports = invCont

@@ -19,6 +19,11 @@ router.get("/login", utilities.handleErrors(accountController.buildLogin));
 router.get("/register", utilities.handleErrors(accountController.buildRegister))
 
 
+// Route to build account management view
+router.get(
+  "/", 
+  utilities.handleErrors(accountController.buildAccountManagement) 
+)
 /* ****************************************
  * Process Registration (POST)
  * *************************************** */
