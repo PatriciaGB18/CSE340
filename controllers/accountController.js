@@ -11,7 +11,7 @@ async function buildLogin(req, res, next) {
   res.render("account/login", {
     title: "Login",
     nav,
-    errors: null,
+    errors: null, // Always pass errors as null here for a clean view
   })
 }
 
@@ -26,11 +26,6 @@ async function buildRegister(req, res, next) {
     errors: null,
   })
 }
-
-/* ****************************************
- * Process Registration
- * *************************************** */
-
 
 /* ****************************************
  * Process Registration
@@ -71,16 +66,18 @@ async function registerAccount(req, res) {
       "notice",
       `Congratulations, you\'re registered ${account_firstname}. Please log in.`
     )
+    
     res.status(201).render("account/login", {
       title: "Login",
       nav,
+      errors: null, 
     })
   } else {
     req.flash("notice", "Sorry, the registration failed.")
     res.status(501).render("account/register", {
       title: "Registration",
       nav,
-      
+      errors: null, 
     })
   }
 }
