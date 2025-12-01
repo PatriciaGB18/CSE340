@@ -14,18 +14,10 @@ async function submitNewReview(req, res, next) {
     // 2. Check for validation errors passed from the middleware
     const errors = res.locals.errors;
     if (errors && !errors.isEmpty()) {
-        // If there are errors, we need to rebuild the detail view with sticky data and errors
-        // We call the inventory controller to handle the view, passing necessary data
-        // We rely on the invController to pass the review list
         req.flash("notice", "Review submission failed. Please check your entries.");
-        
-        // Temporarily store sticky data if needed (though not strictly required for a small review form)
         res.locals.review_text = review_text;
         res.locals.review_rating = review_rating;
-        
-        // Re-run the detail view logic (we pretend this is a GET request for the detail view)
-        // We call the inventory controller directly to re-render the detail page
-        req.params.inv_id = inv_id; // Set the param the detail view expects
+        req.params.inv_id = inv_id; 
         return invController.buildVehicleDetailView(req, res, next);
     }
     
@@ -48,19 +40,17 @@ async function submitNewReview(req, res, next) {
 }
 
 /* ****************************************
- * Deliver delete confirmation view (NOVO)
+ * Deliver delete confirmation view (GET)
  * *************************************** */
 async function buildDeleteView(req, res, next) {
     const review_id = parseInt(req.params.reviewId);
     let nav = await utilities.getNav();
-    
     
     const reviewData = await reviewModel.getReviewByReviewId(review_id);
     
     
     if (!reviewData) { 
         req.flash("notice", "Review not found.");
-        
         return res.redirect("/account/"); 
     }
     
@@ -74,7 +64,6 @@ async function buildDeleteView(req, res, next) {
         title: "Delete Review",
         nav,
         review_id: reviewData.review_id,
-        
         review_date: reviewData.review_date.toLocaleDateString('en-US'),
         review_text: reviewData.review_text,
         inv_id: reviewData.inv_id,
@@ -83,12 +72,21 @@ async function buildDeleteView(req, res, next) {
 }
 
 /* ****************************************
- * Process review deletion (NOVO)
+ * Process review deletion (POST) 
  * *************************************** */
 async function deleteReview(req, res, next) {
-    
     const { review_id, inv_id } = req.body;
     const review_id_int = parseInt(review_id);
+    
+    
+    const reviewData = await reviewModel.getReviewByReviewId(review_id_int);
+    
+    
+    if (!reviewData || reviewData.account_id !== res.locals.accountData.account_id) {
+        req.flash("notice", "Deletion failed: Authorization denied or review not found.");
+        
+        return res.redirect(`/inv/detail/${inv_id}`);
+    }
     
     
     const deleteResult = await reviewModel.deleteReview(review_id_int);
@@ -96,7 +94,7 @@ async function deleteReview(req, res, next) {
     if (deleteResult) {
         req.flash("notice", `Review was successfully deleted.`);
     } else {
-        req.flash("notice", "Review deletion failed.");
+        req.flash("notice", "Review deletion failed (Server error).");
     }
     
     
