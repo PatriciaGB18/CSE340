@@ -194,6 +194,80 @@ Util.checkAuthorization = (req, res, next) => {
         return res.redirect("/account/login");
     }
 };
+Util.buildReviewSection = function (reviews, inv_id, locals) { 
+    let html = '<h2>Customer Reviews</h2>';
+    const errors = locals.errors || [];
+    const loggedin = locals.loggedin;
+    
+    const currentAccountId = locals.accountData ? locals.accountData.account_id : null; 
 
+    // Display errors if validation failed (passed from controller)
+    if (errors && errors.length > 0) {
+        html += '<ul class="notice">';
+        errors.array().forEach(error => {
+            html += `<li>${error.msg}</li>`;
+        });
+        html += '</ul>';
+    }
+
+
+    // 1. Add Submission Form (Only if logged in)
+    if (loggedin) {
+        // Retrieve sticky data if it exists from res.locals
+        const review_text = locals.review_text || ''; 
+        const review_rating = locals.review_rating || ''; 
+
+        html += `
+            <div class="review-form-container">
+                <h3>Submit Your Review</h3>
+                <form action="/review/submit" method="POST" id="reviewForm">
+                    <label for="review_rating">Rating (1-5):</label>
+                    <input type="number" id="review_rating" name="review_rating" min="1" max="5" required value="${review_rating}">
+                    
+                    <label for="review_text">Comment:</label>
+                    <textarea id="review_text" name="review_text" rows="4" required minlength="5">${review_text}</textarea>
+                    
+                    <input type="hidden" name="inv_id" value="${inv_id}">
+                    <button type="submit" class="submitButton">Post Review</button>
+                </form>
+            </div>
+        `;
+    } else {
+        html += '<p>Please <a href="/account/login">log in</a> to submit a review.</p>';
+    }
+
+
+    // 2. Display Existing Reviews
+    if (reviews && reviews.length > 0) {
+        html += '<div class="existing-reviews">';
+        reviews.forEach(review => {
+            // Format date for better display
+            const formattedDate = new Date(review.review_date).toLocaleDateString('en-US');
+            
+            
+            let deleteLink = '';
+            if (currentAccountId && review.account_id === currentAccountId) {
+                 deleteLink = `<a href="/review/delete/${review.review_id}" class="delete-review-link" title="Delete this review">Delete</a>`;
+            }
+
+            html += `
+                <div class="review-card">
+                    <p class="review-meta">
+                        <strong>${review.account_firstname}</strong> reviewed on 
+                        <span>${formattedDate}</span> 
+                        <span class="rating">(${review.review_rating} / 5 stars)</span>
+                        ${deleteLink} <!-- Botão DELETE aqui -->
+                    </p>
+                    <p class="review-text">${review.review_text}</p>
+                </div>
+            `;
+        });
+        html += '</div>';
+    } else {
+        html += '<p>No reviews yet. Be the first!</p>';
+    }
+
+    return html;
+};
 
 module.exports = Util;

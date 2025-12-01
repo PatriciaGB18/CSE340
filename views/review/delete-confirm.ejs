@@ -1,0 +1,26 @@
+<%- messages() %>
+
+<% if (title) { %>
+    <h1><%= title %></h1>
+<% } else { %>
+    <% res.redirect('/') %>
+<% } %>
+
+<h2>Confirm Deletion</h2>
+<p>Are you sure you want to delete the following review? This action cannot be undone.</p>
+
+<div class="review-delete-summary">
+    <p><strong>Date:</strong> <%= review_date %></p>
+    <p><strong>Review Text:</strong></p>
+    <blockquote class="review-text-quote"><%= review_text %></blockquote>
+</div>
+
+<form action="/review/delete" method="POST" class="delete-form">
+    <p class="notice">Clicking "Confirm Delete" will permanently remove this review.</p>
+    
+    
+    <input type="hidden" name="review_id" value="<%= review_id %>">
+    <input type="hidden" name="inv_id" value="<%= inv_id %>">
+    
+    <button type="submit" class="submitButton delete-button">Confirm Delete</button>
+</form>

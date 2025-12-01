@@ -1,20 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  
+<%- messages() %>
 
-</head>
-<body>
-  
-  <main>
-    <%# This variable comes from invController.js and contains %>
-    <%# the pre-built HTML from utilities/index.js %>
-    <%- vehicleDetail %>
-  </main>
+<% if (title) { %>
+    <h1><%= title %></h1>
+<% } else { %>
+    <% res.redirect('/') %>
+<% } %>
 
-  
-</body>
-</html>
+
+<%- detailDisplay %> 
+
+
+<%- reviewSection %>

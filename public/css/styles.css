@@ -88,6 +88,7 @@ h1, h2 {
     color: var(--secondary-color); /* Use the bright blue link color */
     text-decoration: none;
     transition: text-decoration 0.3s ease;
+    padding: 1rem 1.5rem;
 }
 
 #tools a:hover {
@@ -652,4 +653,111 @@ body {
     padding-top: 20px;
     padding-bottom: 20px;
     
+}
+
+/* ---------------------------------
+  REVIEW SECTION STYLES (NOVO RECURSO)
+---------------------------------- */
+
+.review-form-container {
+    background-color: #f7f7f7;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.review-form-container h3 {
+    color: var(--secondary-color); 
+    margin-top: 0;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+
+.review-form-container form {
+    display: grid;
+    gap: 15px;
+}
+
+.review-form-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: -10px; 
+}
+
+
+.review-form-container input[type="number"],
+.review-form-container textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; 
+}
+
+/* Rating input size control */
+.review-form-container input[type="number"] {
+    max-width: 100px;
+}
+
+
+.review-form-container .submitButton {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.review-form-container .submitButton:hover {
+    background-color: #0056b3;
+}
+
+
+/* ---------------------------------
+  EXISTING REVIEWS LIST
+---------------------------------- */
+
+.existing-reviews {
+    margin-top: 40px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.review-card {
+    border: 1px solid #e0e0e0;
+    background-color: #ffffff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.review-meta {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 5px;
+}
+
+.review-meta strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.review-meta .rating {
+    font-style: italic;
+    color: #d9534f; 
+    font-weight: bold;
+}
+
+.review-text {
+    margin-top: 0;
+    line-height: 1.5;
 }

@@ -21,6 +21,7 @@ const baseController = require("./controllers/baseController");
 const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser")
 
+const reviewRoute = require("./routes/reviewRoute");
 const app = express()
 
 /* ***********************
@@ -68,7 +69,7 @@ app.use(express.static(path.join(__dirname, "public")))
  * Body Parsers (important!)
  *************************/
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true })) // for parsing application
 
 /* ***********************
  * Routes
@@ -82,6 +83,7 @@ app.use("/inv", inventoryRoute)
 // Account routes (Defined only once)
 app.use("/account", accountRoute); 
 
+app.use("/review", reviewRoute);
 
 /* ***********************
  * 404 Handler
@@ -122,3 +124,6 @@ const host = process.env.HOST || "0.0.0.0"
 app.listen(port, host, () => {
   console.log(`App listening on http://${host}:${port}`)
 })
+
+
+

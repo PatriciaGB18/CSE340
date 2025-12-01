@@ -1,6 +1,8 @@
 const invModel = require("../models/inventory-model")
 const utilities = require("../utilities/") 
 
+const reviewModel = require("../models/review-model"); 
+
 const invCont = {}
 
 /* ****************************************
@@ -73,6 +75,7 @@ invCont.registerClassification = async function (req, res) {
         res.render("inventory/management", {
             title: "Inventory Management",
             nav, // Pass the newly built navigation
+            errors: null,
         })
     } else {
         // FAILURE:
@@ -164,43 +167,95 @@ invCont.getInventoryJSON = async (req, res, next) => {
     }
 }
 
+/* ****************************************
+ * Build vehicle detail view (MODIFIED for Reviews)
+ * *************************************** */
+invCont.buildVehicleDetailView = async function(req, res, next) {
+    const inv_id = req.params.inv_id
+    let nav = await utilities.getNav()
+
+    // 1. Get vehicle data - O Model retorna um objeto único (data.rows[0])
+    let vehicle;
+    try {
+        // Usando getInventoryById que retorna um objeto
+        vehicle = await invModel.getInventoryById(inv_id) 
+    } catch (error) {
+        console.error("Error retrieving vehicle data:", error);
+        throw new Error("Failed to retrieve vehicle details.");
+    }
+    
+    // Check if vehicle data was found (se o veículo não existe ou tem dados incompletos)
+    if (!vehicle || !vehicle.inv_make) {
+        // Envia para o manipulador de erros 404
+        const err = new Error(`Vehicle with ID ${inv_id} not found or data is missing.`)
+        err.status = 404
+        return next(err) 
+    }
+
+    // 2. Get reviews for this vehicle (NEW REQUIREMENT)
+    const reviews = await reviewModel.getReviewsByInventoryId(inv_id); 
+
+    // 3. Build HTML display
+    const detailDisplay = utilities.wrapVehicleAsHTML(vehicle)
+    
+    // 4. Build Review HTML display 
+    // CORREÇÃO FINAL: Passa reviews, inv_id e res.locals para acessar erros/sticky data
+    const reviewSection = utilities.buildReviewSection(reviews, vehicle.inv_id, res.locals); 
+
+    res.render("inventory/detail", {
+        title: `${vehicle.inv_make} ${vehicle.inv_model}`,
+        nav,
+        detailDisplay, 
+        reviewSection, 
+        errors: null,
+    })
+}
 
 /* ***************************
  * Build edit inventory view
  * ************************** */
 invCont.buildEditInventoryView = async function (req, res, next) {
-    // Coleta o inv_id da URL e converte para inteiro
+    
     const inv_id = parseInt(req.params.inv_id)
     
     const nav = await utilities.getNav()
     
-    // Chama o modelo para obter os dados do item
+    
+    // NOTE: This uses getInventoryById, which is assumed to return a single object (rows[0])
     const itemData = await invModel.getInventoryById(inv_id)
 
-    // Constrói o menu suspenso de classificações, pré-selecionando a classificação atual do item
-    const classificationSelect = await utilities.buildClassificationList(itemData.classification_id)
+    // Check for itemData existence
+    if (!itemData || itemData.length === 0) {
+        throw new Error("Item not found.")
+    }
+
+    // Since getInventoryById often returns an array, ensure we use the object from the array
+    const item = Array.isArray(itemData) ? itemData[0] : itemData;
     
-    // Cria o nome para o título da página
-    const itemName = `${itemData.inv_make} ${itemData.inv_model}`
     
-    // Renderiza a view de edição
+    const classificationSelect = await utilities.buildClassificationList(item.classification_id)
+    
+    
+    const itemName = `${item.inv_make} ${item.inv_model}`
+    
+    
     res.render("./inventory/edit-inventory", {
-        title: "Edit " + itemName, // Título da página
+        title: "Edit " + itemName, 
         nav,
         classificationSelect: classificationSelect,
         errors: null,
-        // Passa todos os dados do item para preencher o formulário (stickiness)
-        inv_id: itemData.inv_id,
-        inv_make: itemData.inv_make,
-        inv_model: itemData.inv_model,
-        inv_year: itemData.inv_year,
-        inv_description: itemData.inv_description,
-        inv_image: itemData.inv_image,
-        inv_thumbnail: itemData.inv_thumbnail,
-        inv_price: itemData.inv_price,
-        inv_miles: itemData.inv_miles,
-        inv_color: itemData.inv_color,
-        classification_id: itemData.classification_id
+        
+        inv_id: item.inv_id,
+        inv_make: item.inv_make,
+        inv_model: item.inv_model,
+        inv_year: item.inv_year,
+        inv_description: item.inv_description,
+        inv_image: item.inv_image,
+        inv_thumbnail: item.inv_thumbnail,
+        inv_price: item.inv_price,
+        inv_miles: item.inv_miles,
+        inv_color: item.inv_color,
+        classification_id: item.classification_id
     })
 }
 
@@ -263,13 +318,10 @@ invCont.updateInventory = async function (req, res, next) {
     }
 }
 
-// ... (Código para buildEditInventoryView e updateInventory) ...
-
 /* ***************************
  * Build delete inventory view
  * ************************** */
-// Function definition remains the same
-async function buildDeleteView(req, res, next) {
+invCont.buildDeleteView = async function buildDeleteView(req, res, next) {
     const inv_id = await parseInt(req.params.inv_id)
     const nav = await utilities.getNav()
     const itemData = await invModel.getInventoryItemById(inv_id)
@@ -295,14 +347,10 @@ async function buildDeleteView(req, res, next) {
     })
 }
 
-// ATTACH THE NEW FUNCTION TO invCont
-invCont.buildDeleteView = buildDeleteView // <-- FIX 1: Attach buildDeleteView
-
 /* ***************************
  * Process delete inventory item
  * ************************** */
-// Function definition remains the same
-async function deleteInventoryItem(req, res, next) {
+invCont.deleteInventoryItem = async function deleteInventoryItem(req, res, next) {
     const inv_id = parseInt(req.body.inv_id) // Get the inv_id from the hidden input
 
     // Call the model function to perform the deletion
@@ -321,10 +369,10 @@ async function deleteInventoryItem(req, res, next) {
     }
 }
 
-// ATTACH THE NEW FUNCTION TO invCont
-invCont.deleteInventoryItem = deleteInventoryItem // <-- FIX 2: Attach deleteInventoryItem
-
-
+// Function to trigger a 500 error for testing (required by a previous assignment)
+invCont.triggerError = async function (req, res, next) {
+    throw new Error("This is a 500 test error.");
+}
 
 
 module.exports = invCont
